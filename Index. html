@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه خدمات دانشجویی - دانشگاه آزاد اسلامی</title>
+    <style>
+        @font-face {
+            font-family: 'Vazir';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir-Regular.woff2') format('woff2');
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazir', Tahoma, Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to left, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 4px solid #ffd700;
+        }
+        
+        .header img {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            font-size: 16px;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to left, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2a5298;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            color: #2a5298;
+            font-weight: bold;
+        }
+        
+        .student-info {
+            display: none;
+        }
+        
+        .student-info.active {
+            display: block;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .info-details {
+            flex: 1;
+        }
+        
+        .info-photo {
+            width: 120px;
+            height: 140px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #2a5298;
+            margin-right: 20px;
+        }
+        
+        .info-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 180px;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: 2px solid #2a5298;
+            background: white;
+            color: #2a5298;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .action-btn.primary {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #1e3c72;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2a5298;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.confirm {
+            background: #28a745;
+            color: white;
+        }
+        
+        .modal-btn.cancel {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .address-form {
+            margin: 20px 0;
+        }
+        
+        .address-form input,
+        .address-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Vazir', Tahoma, Arial, sans-serif;
+            font-size: 14px;
+        }
+        
+        .address-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .summary-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-right: 4px solid #2a5298;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 16px;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2a5298;
+            direction: ltr;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+            line-height: 1.8;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+        <div class="loading-text">در حال بارگذاری اطلاعات...</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <img src="https://uploadkon.ir/uploads/8c7419_26images-2-.png" alt="دانشگاه آزاد اسلامی">
+            <h1>دانشگاه آزاد اسلامی واحد علوم و تحقیقات</h1>
+            <h2>سامانه جامع خدمات الکترونیک دانشجویان</h2>
+        </div>
+
+        <div class="content">
+            <!-- Login Form -->
+            <div id="loginSection" class="login-form">
+                <h3 style="text-align: center; margin-bottom: 30px; color: #2a5298;">ورود به سامانه</h3>
+                <div class="form-group">
+                    <label for="studentId">شماره دانشجویی:</label>
+                    <input type="text" id="studentId" placeholder="شماره دانشجویی خود را وارد نمایید" maxlength="10">
+                </div>
+                <div class="form-group">
+                    <label for="nationalCode">کد ملی:</label>
+                    <input type="text" id="nationalCode" placeholder="کد ملی خود را وارد نمایید" maxlength="10">
+                </div>
+                <button class="btn" onclick="login()">ورود به سامانه</button>
+            </div>
+
+            <!-- Student Info -->
+            <div id="studentSection" class="student-info">
+                <div class="info-card">
+                    <div class="info-header">
+                        <div class="info-details">
+                            <h3 style="color: #2a5298; margin-bottom: 15px;">اطلاعات دانشجویی</h3>
+                        </div>
+                        <div class="info-photo">
+                            <img src="https://uploadkon.ir/uploads/d2c219_26IMG-20260219-215319-571.jpg" alt="عکس دانشجویی">
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label">نام و نام خانوادگی:</span>
+                        <span class="info-value">حسن سنجابی</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">نام پدر:</span>
+                        <span class="info-value">بختی</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">شماره دانشجویی:</span>
+                        <span class="info-value">۹۳۰۳۹۱۲۸۶</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">شماره ملی:</span>
+                        <span class="info-value">۳۳۴۰۳۰۱۶۳۸</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">مقطع تحصیلی:</span>
+                        <span class="info-value">کارشناسی ارشد ناپیوسته</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">رشته تحصیلی:</span>
+                        <span class="info-value">مدیریت خدمات بهداشتی و درمانی</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">تاریخ فارغ‌التحصیلی:</span>
+                        <span class="info-value">۲۶/۰۸/۱۳۹۸</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">وضعیت تحصیلی:</span>
+                        <span class="info-value" style="color: #28a745; font-weight: bold;">فارغ‌التحصیل</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="action-btn">مشاهده کارنامه تحصیلی</button>
+                    <button class="action-btn">گواهی اشتغال به تحصیل</button>
+                    <button class="action-btn primary" onclick="requestDuplicate()">درخواست مدرک المثنی</button>
+                    <button class="action-btn">تاییدیه فارغ‌التحصیلی</button>
+                    <button class="action-btn">مشاهده سوابق آموزشی</button>
+                    <button class="action-btn">درخواست ریز نمرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 1: Confirmation -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">تأیید درخواست مدرک المثنی</div>
+            <div class="modal-body">
+                <p><strong>توجه:</strong> درخواست مدرک المثنی فارغ‌التحصیلی تنها یک‌بار قابل پذیرش می‌باشد.</p>
+                <p style="margin-top: 15px;">هزینه صدور مدرک المثنی: <strong style="color: #dc3545;">۹,۶۹۰,۰۰۰ ریال</strong></p>
+                <p style="margin-top: 10px;">آیا از ثبت درخواست اطمینان دارید؟</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('confirmModal')">انصراف</button>
+                <button class="modal-btn confirm" onclick="showAddressOptions()">تأیید و ادامه</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Address Options -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">انتخاب آدرس ارسال مدرک</div>
+            <div class="modal-body">
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>هزینه صدور مدرک المثنی:</span>
+                        <span>۹,۶۹۰,۰۰۰ ریال</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>موجودی کیف پول:</span>
+                        <span style="color: #dc3545;">۱۰,۰۰۰ ریال</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>مبلغ قابل پرداخت:</span>
+                        <span style="color: #28a745;">۹,۶۸۰,۰۰۰ ریال</span>
+                    </div>
+                </div>
+                <p style="margin: 20px 0;">مدرک المثنی به آدرس ثبت‌شده در سامانه املاک و اسکان ارسال خواهد شد.</p>
+                <p><strong>آیا مایل به ویرایش آدرس پستی هستید؟</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('addressModal')">انصراف</button>
+                <button class="modal-btn" style="background: #ffc107;" onclick="editAddress()">ویرایش آدرس</button>
+                <button class="modal-btn confirm" onclick="showPayment()">ثبت با آدرس فعلی</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Edit Address -->
+    <div id="editAddressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">ویرایش آدرس پستی</div>
+            <div class="modal-body">
+                <div class="address-form">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">کد پستی (۱۰ رقم):</label>
+                    <input type="text" id="postalCode" placeholder="کد پستی ده رقمی بدون خط تیره" maxlength="10">
+                    
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">آدرس کامل پستی:</label>
+                    <textarea id="fullAddress" placeholder="آدرس کامل شامل: استان، شهر، خیابان، کوچه، پلاک و واحد را به طور دقیق وارد نمایید"></textarea>
+                </div>
+                <div class="alert-box">
+                    لطفاً آدرس پستی خود را به دقت و کامل وارد نمایید. مسئولیت صحت اطلاعات وارد شده بر عهده متقاضی می‌باشد.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('editAddressModal')">انصراف</button>
+                <button class="modal-btn confirm" onclick="confirmAddress()">ثبت آدرس</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: Payment Summary -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">تأیید نهایی و پرداخت</div>
+            <div class="modal-body">
+                <h4 style="color: #2a5298; margin-bottom: 15px;">خلاصه درخواست:</h4>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>نوع درخواست:</span>
+                        <span>صدور مدرک المثنی فارغ‌التحصیلی</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>مقطع تحصیلی:</span>
+                        <span>کارشناسی ارشد ناپیوسته</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>کد پستی:</span>
+                        <span id="summaryPostalCode">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>آدرس ارسال:</span>
+                        <span id="summaryAddress" style="font-size: 12px;">-</span>
+                    </div>
+                </div>
+                
+                <h4 style="color: #2a5298; margin: 20px 0 15px;">اطلاعات مالی:</h4>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>هزینه صدور مدرک:</span>
+                        <span>۹,۶۹۰,۰۰۰ ریال</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>موجودی کیف پول:</span>
+                        <span>۱۰,۰۰۰ ریال</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>کسر از کیف پول:</span>
+                        <span style="color: #dc3545;">۱۰,۰۰۰ ریال</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>
