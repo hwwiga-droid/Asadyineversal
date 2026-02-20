@@ -3,346 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024">
-    <title>سامانه مرکزی قرعه‌کشی سایپا - وزارت صنعت، معدن و تجارت</title>
+    <title>سامانه قرعه‌کشی سایپا - DOS Mode</title>
     <style>
         @font-face {
             font-family: 'Far_Bank';
             src: url('Far_Bank.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-font-smoothing: none;
-            -moz-osx-font-smoothing: grayscale;
+            cursor: default;
         }
         
         body {
             background: #000000;
+            color: #00ff00;
             font-family: 'Far_Bank', 'Courier New', monospace;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Old CRT Monitor Effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Phosphor Glow Effect */
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
+            to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+        
+        /* Main Terminal */
+        .dos-terminal {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, #000033 0%, #000066 100%);
+            display: flex;
+            flex-direction: column;
+            animation: bootUp 0.5s ease-out;
+        }
+        
+        @keyframes bootUp {
+            from { 
+                opacity: 0;
+                transform: scaleY(0.1);
+            }
+            to { 
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+        
+        /* Header */
+        .dos-header {
+            background: #0000aa;
+            border-bottom: 4px double #00ffff;
+            padding: 15px;
+            text-align: center;
+            animation: slideDown 0.3s ease-out 0.5s both;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .logo-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            direction: rtl;
-            overflow: hidden;
-            cursor: default;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
-        
-        /* CRT Monitor Effects */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 0, 0, 0.15),
-                    rgba(0, 0, 0, 0.15) 1px,
-                    transparent 1px,
-                    transparent 2px
-                ),
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(255, 0, 0, 0.03),
-                    rgba(0, 255, 0, 0.02),
-                    rgba(0, 0, 255, 0.03)
-                );
-            pointer-events: none;
-            z-index: 10000;
-        }
-        
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                ellipse at center,
-                transparent 0%,
-                rgba(0, 0, 0, 0.4) 100%
-            );
-            pointer-events: none;
-            z-index: 10001;
-        }
-        
-        /* Phosphor Glow */
-        @keyframes phosphorGlow {
-            0%, 100% { opacity: 0.9; }
-            50% { opacity: 1; }
-        }
-        
-        /* Terminal Container */
-        .terminal-frame {
-            width: 1000px;
-            height: 90vh;
-            max-height: 750px;
-            background: #000033;
-            border: 8px ridge #606060;
-            box-shadow: 
-                0 0 100px rgba(0, 128, 255, 0.3),
-                inset 0 0 50px rgba(0, 0, 0, 0.8),
-                0 0 20px rgba(0, 0, 0, 0.8);
-            position: relative;
-            animation: phosphorGlow 4s ease-in-out infinite;
-        }
-        
-        .terminal-screen {
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(135deg, #000044 0%, #000066 25%, #000088 50%, #000066 75%, #000044 100%);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Top Bar */
-        .system-bar {
-            background: linear-gradient(to bottom, #0000aa 0%, #000088 50%, #000066 100%);
-            border-bottom: 3px ridge #00ffff;
-            padding: 4px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
-        }
-        
-        .system-info {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .sys-item {
-            color: #00ff00;
-            font-size: 11px;
-            padding: 2px 8px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #004400;
-        }
-        
-        .sys-item.active {
-            color: #ffff00;
-            border-color: #666600;
-            animation: sysBlink 2s infinite;
-        }
-        
-        @keyframes sysBlink {
-            0%, 90%, 100% { opacity: 1; }
-            95% { opacity: 0.6; }
-        }
-        
-        /* Header Section */
-        .header-container {
-            background: linear-gradient(to bottom, 
-                rgba(0,0,80,0.8) 0%, 
-                rgba(0,0,100,0.9) 50%, 
-                rgba(0,0,80,0.8) 100%);
-            border-bottom: 4px double #00ffff;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(0, 255, 255, 0.1),
-                transparent
-            );
-            animation: headerSweep 8s linear infinite;
-        }
-        
-        @keyframes headerSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        .header-main {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .ministry-title {
-            background: linear-gradient(to right, 
-                rgba(0,0,0,0.8) 0%, 
-                rgba(0,0,40,0.9) 50%, 
-                rgba(0,0,0,0.8) 100%);
-            border: 2px solid #ffff00;
-            padding: 8px 20px;
-            color: #ffff00;
-            font-size: 14px;
-            text-align: center;
-            box-shadow: 
-                0 0 20px rgba(255, 255, 0, 0.4),
-                inset 0 0 20px rgba(255, 255, 0, 0.1);
-            text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
-        }
-        
-        .logo-section {
-            display: flex;
-            align-items: center;
             gap: 30px;
+            margin-bottom: 10px;
         }
         
-        /* DOS-style Logo */
-        .dos-logo {
-            width: 100px;
-            height: 100px;
+        .ascii-logo {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #00ff00;
             background: #000000;
-            border: 3px solid #00ff00;
-            padding: 5px;
-            position: relative;
-            box-shadow: 
-                0 0 30px rgba(0, 255, 0, 0.5),
-                inset 0 0 20px rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
         }
         
-        .dos-logo img {
+        .ascii-logo img {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: 
-                brightness(1.2)
-                contrast(1.5)
-                saturate(0)
-                sepia(1)
-                hue-rotate(90deg)
-                drop-shadow(0 0 3px #00ff00);
-            mix-blend-mode: screen;
-            image-rendering: pixelated;
-        }
-        
-        .dos-logo::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 255, 0, 0.1) 2px,
-                    rgba(0, 255, 0, 0.1) 4px
-                );
-            pointer-events: none;
-        }
-        
-        .dos-logo::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(
-                circle at center,
-                transparent 30%,
-                rgba(0, 255, 0, 0.2) 100%
-            );
-            animation: logoPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes logoPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        
-        .title-block {
-            flex: 1;
-            text-align: center;
+            filter: brightness(0) saturate(100%) invert(68%) sepia(97%) saturate(1274%) hue-rotate(81deg) brightness(103%) contrast(119%);
         }
         
         .main-title {
             color: #ffffff;
-            font-size: 28px;
-            margin-bottom: 10px;
-            text-shadow: 
-                2px 2px 0 #000000,
-                0 0 30px rgba(255, 255, 255, 0.5),
-                0 0 10px rgba(0, 255, 255, 0.8);
-            letter-spacing: 2px;
-            animation: titleGlow 3s ease-in-out infinite;
-        }
-        
-        @keyframes titleGlow {
-            0%, 100% { 
-                text-shadow: 
-                    2px 2px 0 #000000,
-                    0 0 30px rgba(255, 255, 255, 0.5),
-                    0 0 10px rgba(0, 255, 255, 0.8);
-            }
-            50% { 
-                text-shadow: 
-                    2px 2px 0 #000000,
-                    0 0 40px rgba(255, 255, 255, 0.8),
-                    0 0 20px rgba(0, 255, 255, 1);
-            }
+            font-size: 24px;
+            text-shadow: 2px 2px 0 #000000, 0 0 30px rgba(255,255,255,0.5);
+            animation: textGlow 2s ease-in-out infinite alternate;
         }
         
         .sub-title {
             color: #00ffff;
             font-size: 16px;
-            margin-bottom: 12px;
-            text-shadow: 1px 1px 0 #000000;
+            margin-top: 5px;
         }
         
-        .company-list {
+        .companies {
+            margin-top: 10px;
             display: flex;
             justify-content: center;
             gap: 15px;
         }
         
-        .company-item {
-            background: rgba(0, 0, 50, 0.8);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            padding: 4px 12px;
+        .company-badge {
+            background: #000033;
+            border: 1px solid #00ff00;
+            padding: 3px 10px;
+            color: #00ff00;
             font-size: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .company-item::before {
-            content: '◆';
-            margin-left: 5px;
-            color: #ffff00;
-            animation: iconBlink 1s infinite;
-        }
-        
-        @keyframes iconBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
         }
         
         /* Content Area */
-        .content-wrapper {
+        .dos-content {
             flex: 1;
             display: flex;
             padding: 15px;
@@ -350,308 +147,184 @@
             overflow: hidden;
         }
         
-        /* Main Panel */
-        .main-panel {
+        /* Form Panel */
+        .form-panel {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            animation: fadeIn 0.5s ease-out 0.8s both;
         }
         
-        .form-container {
-            background: rgba(0, 0, 40, 0.9);
-            border: 3px double #00ffff;
-            box-shadow: 
-                inset 0 0 30px rgba(0, 0, 0, 0.8),
-                0 0 20px rgba(0, 255, 255, 0.2);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .form-box {
+            background: rgba(0,0,40,0.8);
+            border: 2px solid #00ffff;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
         }
         
         .form-header {
-            background: linear-gradient(to right, 
-                #004444 0%, 
-                #006666 50%, 
-                #004444 100%);
+            background: #008080;
             color: #ffffff;
-            padding: 10px 15px;
-            font-size: 15px;
+            padding: 8px 15px;
+            font-size: 14px;
             border-bottom: 2px solid #00ffff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .form-header-icon {
-            color: #ffff00;
-            font-size: 18px;
-            animation: rotate 4s linear infinite;
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
         
         .form-body {
-            padding: 20px;
+            padding: 15px;
         }
         
-        .field-row {
+        .field-group {
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            margin-bottom: 16px;
-            position: relative;
         }
         
         .field-label {
             color: #ffff00;
-            font-size: 14px;
-            min-width: 140px;
-            text-shadow: 0 0 3px rgba(255, 255, 0, 0.5);
+            min-width: 120px;
+            font-size: 13px;
         }
         
         .field-label::before {
-            content: '▸';
+            content: '► ';
             color: #00ff00;
-            margin-left: 8px;
-            animation: arrowPulse 1s infinite;
-        }
-        
-        @keyframes arrowPulse {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(3px); }
         }
         
         .field-input {
             flex: 1;
             background: #000000;
-            border: 2px inset #003333;
+            border: 2px inset #004040;
             color: #00ff00;
-            padding: 10px 12px;
-            font-family: 'Far_Bank', monospace;
-            font-size: 15px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 14px;
             direction: ltr;
-            text-align: right;
-            text-shadow: 0 0 2px currentColor;
         }
         
         .field-input:focus {
             outline: none;
             border-color: #00ff00;
-            box-shadow: 
-                0 0 20px rgba(0, 255, 0, 0.5),
-                inset 0 0 5px rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 10px rgba(0,255,0,0.5);
         }
         
-        .field-input.system-field {
+        .field-input.readonly {
             color: #808080;
-            background: linear-gradient(to bottom, #000000 0%, #000022 100%);
-            text-shadow: 0 0 2px rgba(128, 128, 128, 0.5);
         }
         
-        .field-input.user-field {
+        .field-input.user-input {
             color: #ffffff;
-            border-color: #ff9900;
-            background: linear-gradient(to bottom, #000000 0%, #1a0a00 100%);
-            text-shadow: 0 0 3px rgba(255, 153, 0, 0.5);
+            border-color: #ff8800;
         }
         
-        .field-input.user-field:focus {
-            border-color: #ffcc00;
-            box-shadow: 
-                0 0 25px rgba(255, 204, 0, 0.6),
-                inset 0 0 10px rgba(255, 204, 0, 0.1);
-        }
-        
-        .field-hint {
-            position: absolute;
-            bottom: -18px;
-            right: 140px;
-            color: #ff9900;
-            font-size: 11px;
-            animation: hintBlink 2s infinite;
-        }
-        
-        @keyframes hintBlink {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        
-        /* Action Button */
-        .action-container {
-            padding: 15px;
-            text-align: center;
-            border-top: 1px dashed #00ffff;
-        }
-        
-        .action-button {
-            background: linear-gradient(to bottom, 
-                #003300 0%, 
-                #005500 50%, 
-                #003300 100%);
+        .submit-btn {
+            display: block;
+            width: 80%;
+            margin: 20px auto;
+            background: linear-gradient(to bottom, #006600, #003300);
             color: #ffffff;
             border: 3px outset #00ff00;
-            padding: 12px 50px;
-            font-family: 'Far_Bank', monospace;
-            font-size: 18px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 16px;
             cursor: pointer;
-            text-shadow: 2px 2px 4px #000000;
-            box-shadow: 
-                0 0 30px rgba(0, 255, 0, 0.4),
-                inset 0 0 20px rgba(0, 255, 0, 0.1);
-            transition: all 0.15s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(
-                circle,
-                rgba(255, 255, 255, 0.1) 0%,
-                transparent 70%
-            );
-            animation: buttonRotate 3s linear infinite;
-        }
-        
-        @keyframes buttonRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .action-button:hover {
-            background: linear-gradient(to bottom, 
-                #004400 0%, 
-                #006600 50%, 
-                #004400 100%);
-            box-shadow: 
-                0 0 40px rgba(0, 255, 0, 0.6),
-                inset 0 0 25px rgba(0, 255, 0, 0.2);
-            transform: translateY(-1px);
-        }
-        
-        .action-button:active {
-            border-style: inset;
-            transform: translateY(1px);
-        }
-        
-        .action-button:disabled {
-            background: linear-gradient(to bottom, #222222 0%, #111111 100%);
-            border-color: #333333;
-            cursor: not-allowed;
-            box-shadow: none;
-            animation: disabledPulse 1s infinite;
-        }
-        
-        @keyframes disabledPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* Side Panel */
-        .side-panel {
-            width: 280px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .info-widget {
-            background: rgba(0, 0, 30, 0.9);
-            border: 2px solid #ffff00;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.8),
-                0 0 15px rgba(255, 255, 0, 0.2);
-        }
-        
-        .widget-header {
-            background: linear-gradient(to right, #333300, #555500, #333300);
-            color: #ffffff;
-            padding: 8px 12px;
-            font-size: 13px;
-            border-bottom: 2px solid #ffff00;
-            text-align: center;
             text-shadow: 1px 1px 2px #000000;
+            transition: all 0.1s;
         }
         
-        .widget-header::before,
-        .widget-header::after {
-            content: '◆';
-            color: #00ff00;
-            margin: 0 8px;
+        .submit-btn:hover {
+            background: linear-gradient(to bottom, #008800, #004400);
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
         }
         
-        .widget-body {
-            padding: 12px;
+        .submit-btn:active {
+            border-style: inset;
+            transform: translateY(2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #333333;
+            border-color: #666666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        /* Info Panel */
+        .info-panel {
+            width: 250px;
+            animation: fadeIn 0.5s ease-out 1s both;
+        }
+        
+        .info-box {
+            background: rgba(0,0,30,0.8);
+            border: 2px solid #ffff00;
+            margin-bottom: 10px;
+        }
+        
+        .info-header {
+            background: #666600;
+            color: #ffffff;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #ffff00;
+        }
+        
+        .info-body {
+            padding: 10px;
+            font-size: 11px;
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px dotted #333366;
-            font-size: 12px;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-key {
+            margin-bottom: 5px;
             color: #00ffff;
-            text-shadow: 0 0 2px rgba(0, 255, 255, 0.5);
         }
         
         .info-value {
             color: #ffff00;
-            direction: ltr;
-            text-shadow: 0 0 2px rgba(255, 255, 0, 0.5);
-        }
-        
-        .info-value.active {
-            color: #00ff00;
-            animation: valueBlink 1s infinite;
-        }
-        
-        @keyframes valueBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
         }
         
         /* Progress Section */
-        .progress-container {
+        .progress-section {
             display: none;
-            background: rgba(0, 0, 60, 0.95);
-            border: 3px double #00ff00;
+            background: rgba(0,0,60,0.9);
+            border: 2px solid #00ff00;
             padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 
-                inset 0 0 30px rgba(0, 0, 0, 0.8),
-                0 0 20px rgba(0, 255, 0, 0.3);
+            margin-bottom: 10px;
+            animation: expandDown 0.3s ease-out;
+        }
+        
+        @keyframes expandDown {
+            from { 
+                opacity: 0;
+                max-height: 0;
+            }
+            to { 
+                opacity: 1;
+                max-height: 200px;
+            }
         }
         
         .progress-title {
             text-align: center;
             color: #ffff00;
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 10px;
-            text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
-            animation: progressTitlePulse 1s infinite;
+            animation: blink 1s infinite;
         }
         
-        @keyframes progressTitlePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         
-        .progress-bar-wrapper {
+        .progress-bar {
             background: #000000;
-            border: 3px inset #333333;
-            height: 35px;
+            border: 2px inset #333333;
+            height: 30px;
             position: relative;
             overflow: hidden;
         }
@@ -659,854 +332,379 @@
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg,
-                #004400 0%,
-                #00aa00 20%,
-                #00ff00 40%,
-                #00aa00 60%,
-                #004400 80%,
-                #00aa00 100%);
-            background-size: 50px 100%;
-            animation: progressMove 0.5s linear infinite;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
-            transition: width 0.3s linear;
+            background: linear-gradient(90deg, #004400, #00ff00, #004400);
+            transition: width 0.5s;
+            box-shadow: 0 0 10px #00ff00;
         }
         
-        @keyframes progressMove {
-            from { background-position: 0 0; }
-            to { background-position: 50px 0; }
-        }
-        
-        .progress-percent {
+        .progress-text {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ffffff;
-            font-size: 16px;
-            font-weight: bold;
-            text-shadow: 
-                2px 2px 4px #000000,
-                0 0 10px rgba(255, 255, 255, 0.5);
-            z-index: 10;
-        }
-        
-        .progress-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 11px;
-        }
-        
-        .stat-item {
-            color: #00ff00;
-            text-shadow: 0 0 3px rgba(0, 255, 0, 0.5);
-        }
-        
-        .stat-value {
-            color: #ffff00;
-            margin-right: 5px;
-        }
-        
-        /* Names List */
-        .names-container {
-            display: none;
-            background: #000000;
-            border: 3px double #00ff00;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 1),
-                0 0 15px rgba(0, 255, 0, 0.3);
-        }
-        
-        .names-header {
-            background: linear-gradient(to right, #003300, #005500, #003300);
-            color: #ffffff;
-            padding: 10px 15px;
-            border-bottom: 2px solid #00ff00;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .names-title {
             font-size: 14px;
             text-shadow: 1px 1px 2px #000000;
         }
         
-        .names-counter {
+        /* Names Display */
+        .names-section {
+            display: none;
             background: #000000;
-            color: #ffff00;
-            padding: 3px 10px;
-            border: 1px solid #ffff00;
+            border: 2px solid #00ff00;
+            height: 200px;
+            overflow: hidden;
+            animation: expandDown 0.3s ease-out;
+        }
+        
+        .names-header {
+            background: #004400;
+            color: #ffffff;
+            padding: 5px 10px;
             font-size: 12px;
-            text-shadow: 0 0 3px rgba(255, 255, 0, 0.5);
+            border-bottom: 1px solid #00ff00;
         }
         
         .names-list {
-            height: 260px;
+            height: calc(100% - 30px);
             overflow: hidden;
             padding: 5px;
         }
         
-        .name-entry {
-            display: grid;
-            grid-template-columns: 50px 1fr 140px 90px;
-            gap: 10px;
-            padding: 6px 8px;
-            border-bottom: 1px solid #002200;
-            font-size: 13px;
-            animation: entrySlide 0.2s ease-out;
-            background: linear-gradient(to right, 
-                transparent 0%, 
-                rgba(0, 255, 0, 0.05) 50%, 
-                transparent 100%);
+        .name-item {
+            padding: 3px 5px;
+            border-bottom: 1px dotted #003300;
+            font-size: 12px;
+            animation: slideIn 0.1s ease-out;
+            display: flex;
+            justify-content: space-between;
         }
         
-        @keyframes entrySlide {
-            from {
-                transform: translateY(-25px);
+        @keyframes slideIn {
+            from { 
+                transform: translateX(-100%);
                 opacity: 0;
-                background-color: rgba(0, 255, 0, 0.2);
             }
-            to {
-                transform: translateY(0);
+            to { 
+                transform: translateX(0);
                 opacity: 1;
-                background-color: transparent;
             }
         }
         
-        .entry-index {
-            color: #666666;
-            text-align: left;
-            direction: ltr;
-            text-shadow: 0 0 2px rgba(102, 102, 102, 0.5);
-        }
-        
-        .entry-name {
+        .name-text {
             color: #00ff00;
-            text-shadow: 0 0 3px rgba(0, 255, 0, 0.5);
         }
         
-        .entry-file {
+        .name-file {
             color: #00ffff;
-            direction: ltr;
-            text-align: left;
-            text-shadow: 0 0 2px rgba(0, 255, 255, 0.5);
-        }
-        
-        .entry-status {
-            color: #ffff00;
-            text-align: center;
-            text-shadow: 0 0 2px rgba(255, 255, 0, 0.5);
         }
         
         /* Result Modal */
         .result-modal {
             display: none;
-            background: linear-gradient(to bottom, #001100 0%, #002200 100%);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(to bottom, #001100, #002200);
             border: 4px double #00ff00;
-            margin-bottom: 12px;
-            animation: modalAppear 0.5s ease-out;
-            box-shadow: 
-                0 0 50px rgba(0, 255, 0, 0.4),
-                inset 0 0 30px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0,255,0,0.8);
+            z-index: 1000;
+            animation: zoomIn 0.5s ease-out;
+            min-width: 500px;
         }
         
-        @keyframes modalAppear {
+        @keyframes zoomIn {
             from {
-                transform: scale(0.8) rotateX(20deg);
+                transform: translate(-50%, -50%) scale(0);
                 opacity: 0;
             }
             to {
-                transform: scale(1) rotateX(0deg);
+                transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
             }
         }
         
         .result-header {
-            background: linear-gradient(to right, #005500, #00aa00, #005500);
-            color: #ffffff;
-            padding: 15px;
             text-align: center;
-            font-size: 20px;
-            border-bottom: 3px double #00ff00;
-            text-shadow: 
-                2px 2px 4px #000000,
-                0 0 20px rgba(0, 255, 0, 0.8);
-        }
-        
-        .result-content {
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .success-icon {
-            font-size: 48px;
             color: #00ff00;
+            font-size: 20px;
             margin-bottom: 20px;
-            animation: successPulse 0.8s ease-out infinite alternate;
-            text-shadow: 0 0 40px rgba(0, 255, 0, 1);
+            animation: textGlow 1s infinite alternate;
         }
         
-        @keyframes successPulse {
-            from { 
-                transform: scale(0.9);
-                text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
-            }
-            to { 
-                transform: scale(1.1);
-                text-shadow: 0 0 60px rgba(0, 255, 0, 1);
-            }
-        }
-        
-        .result-title {
-            color: #ffff00;
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px #000000;
-        }
-        
-        .result-box {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #00ffff;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .result-text {
+        .result-message {
             color: #ffffff;
             font-size: 14px;
-            line-height: 2.2;
-            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
-        }
-        
-        .highlight-text {
-            color: #00ff00;
-            background: rgba(0, 255, 0, 0.1);
-            padding: 2px 6px;
-            border: 1px dotted #00ff00;
-        }
-        
-        .warning-box {
-            color: #ff9900;
-            margin-top: 15px;
-            padding: 10px;
-            border: 2px dashed #ff9900;
-            background: rgba(255, 153, 0, 0.05);
-            animation: warningBlink 2s infinite;
-        }
-        
-        @keyframes warningBlink {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-        
-        .tracking-section {
-            margin-top: 25px;
-            padding: 20px;
-            background: linear-gradient(to bottom, #000033 0%, #000066 100%);
-            border: 3px ridge #00ffff;
-            display: inline-block;
-            box-shadow: 
-                0 0 30px rgba(0, 255, 255, 0.4),
-                inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .tracking-label {
-            color: #00ffff;
-            font-size: 12px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 3px rgba(0, 255, 255, 0.5);
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 20px;
         }
         
         .tracking-code {
-            color: #ffffff;
-            font-size: 24px;
-            letter-spacing: 3px;
-            direction: ltr;
-            text-shadow: 
-                0 0 20px rgba(255, 255, 255, 0.8),
-                2px 2px 4px #000000;
-            animation: codeBlink 1s infinite;
+            background: #000033;
+            border: 2px solid #00ffff;
+            padding: 10px;
+            text-align: center;
+            color: #ffff00;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin: 20px 0;
         }
         
-        @keyframes codeBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.9; }
+        .warning-text {
+            color: #ff8800;
+            text-align: center;
+            font-size: 12px;
+            animation: blink 2s infinite;
         }
         
-        /* Footer Bar */
-        .footer-bar {
-            background: linear-gradient(to bottom, #0000aa 0%, #000066 100%);
-            border-top: 3px ridge #00ffff;
-            padding: 6px 12px;
+        /* Status Bar */
+        .status-bar {
+            background: #0000aa;
+            border-top: 2px solid #00ffff;
+            padding: 5px 15px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 11px;
-            box-shadow: 0 -2px 10px rgba(0, 255, 255, 0.3);
-        }
-        
-        .footer-left {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .footer-item {
             color: #00ff00;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .footer-item kbd {
-            background: rgba(0, 0, 0, 0.5);
-            color: #ffff00;
-            padding: 1px 6px;
-            border: 1px outset #666666;
-            font-size: 10px;
-        }
-        
-        .status-led {
-            width: 8px;
-            height: 8px;
-            background: #00ff00;
-            border-radius: 50%;
-            display: inline-block;
-            animation: ledBlink 2s infinite;
-            box-shadow: 0 0 5px currentColor;
-        }
-        
-        @keyframes ledBlink {
-            0%, 90%, 100% { opacity: 1; }
-            95% { opacity: 0.3; }
-        }
-        
-        /* Cursor effect */
-        .cursor-active::after {
-            content: '▌';
-            color: #00ff00;
-            animation: cursorFlash 0.5s infinite;
-            margin-right: 2px;
-        }
-        
-        @keyframes cursorFlash {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="terminal-frame">
-        <div class="terminal-screen">
-            <!-- System Bar -->
-            <div class="system-bar">
-                <div class="system-info">
-                    <span class="sys-item">DOS 7.10</span>
-                    <span class="sys-item">MEM: <span id="memUsage">640K</span></span>
-                    <span class="sys-item active">ONLINE</span>
+    <div class="dos-terminal">
+        <!-- Header -->
+        <div class="dos-header">
+            <div class="logo-container">
+                <div class="ascii-logo">
+                    <img src="logo.png" alt="SAIPA" onerror="this.parentElement.innerHTML='SAIPA'">
                 </div>
-                <div class="system-info">
-                    <span class="sys-item" id="systemDate">1403/09/15</span>
-                    <span class="sys-item" id="systemTime">--:--:--</span>
+                <div>
+                    <div class="main-title">سامانه قرعه‌کشی گروه خودروسازی سایپا</div>
+                    <div class="sub-title">وزارت صنعت، معدن و تجارت - نسخه 3.2.1</div>
+                </div>
+                <div class="ascii-logo">
+                    <img src="logo.png" alt="SAIPA" onerror="this.parentElement.innerHTML='SAIPA'">
+                </div>
+            </div>
+            <div class="companies">
+                <span class="company-badge">پارس خودرو</span>
+                <span class="company-badge">رایان سایپا</span>
+                <span class="company-badge">سایپا کاشان</span>
+                <span class="company-badge">زامیاد</span>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="dos-content">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <div class="form-box">
+                    <div class="form-header">◈ فرم ثبت درخواست</div>
+                    <div class="form-body">
+                        <div class="field-group">
+                            <label class="field-label">کد پارس خودرو:</label>
+                            <input type="text" class="field-input readonly" id="parsCode" readonly>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">کد رایان سایپا:</label>
+                            <input type="text" class="field-input readonly" id="rayanCode" readonly>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">شماره سند:</label>
+                            <input type="text" class="field-input readonly" id="docNum" readonly>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">شماره پرونده:</label>
+                            <input type="text" class="field-input readonly" id="fileNum" readonly>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">کد ملی:</label>
+                            <input type="text" class="field-input user-input" id="nationalCode" maxlength="10">
+                        </div>
+                        <button class="submit-btn" id="submitBtn" onclick="startProcess()">
+                            ◄◄ ثبت و پردازش ►►
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-title">در حال پردازش...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                        <div class="progress-text" id="progressText">0%</div>
+                    </div>
+                </div>
+                
+                <div class="names-section" id="namesSection">
+                    <div class="names-header">لیست متقاضیان در حال بررسی</div>
+                    <div class="names-list" id="namesList"></div>
                 </div>
             </div>
             
-            <!-- Header -->
-            <div class="header-container">
-                <div class="header-main">
-                    <div class="dos-logo">
-                        <img src="logo.png" alt="SAIPA" 
-                             onerror="this.parentElement.innerHTML='<div style=\'color:#00ff00;text-align:center;padding-top:35px;font-size:20px;\'>SAIPA<br>سایپا</div>'">
-                    </div>
-                    
-                    <div class="title-block">
-                        <div class="ministry-title">
-                            ═══ وزارت صنعت، معدن و تجارت ═══
+            <!-- Info Panel -->
+            <div class="info-panel">
+                <div class="info-box">
+                    <div class="info-header">◈ وضعیت سیستم</div>
+                    <div class="info-body">
+                        <div class="info-row">
+                            <span>سرور:</span>
+                            <span class="info-value">فعال ●</span>
                         </div>
-                        <div class="main-title">گروه خودروسازی سایپا</div>
-                        <div class="sub-title">سامانه مرکزی قرعه‌کشی و تخصیص خودرو</div>
-                        <div class="company-list">
-                            <span class="company-item">پارس خودرو</span>
-                            <span class="company-item">رایان سایپا</span>
-                            <span class="company-item">سایپا کاشان</span>
-                            <span class="company-item">زامیاد</span>
+                        <div class="info-row">
+                            <span>ترمینال:</span>
+                            <span class="info-value">TRM-2451</span>
                         </div>
-                    </div>
-                    
-                    <div class="dos-logo">
-                        <img src="logo.png" alt="SAIPA"
-                             onerror="this.parentElement.innerHTML='<div style=\'color:#00ff00;text-align:center;padding-top:35px;font-size:20px;\'>SAIPA<br>سایپا</div>'">
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Content -->
-            <div class="content-wrapper">
-                <!-- Main Panel -->
-                <div class="main-panel">
-                    <div class="form-container">
-                        <div class="form-header">
-                            <span class="form-header-icon">◈</span>
-                            <span>فرم ثبت درخواست متقاضیان خودرو</span>
+                        <div class="info-row">
+                            <span>تاریخ:</span>
+                            <span class="info-value">1403/09/15</span>
                         </div>
-                        <div class="form-body">
-                            <div class="field-row">
-                                <label class="field-label">کد شناسایی پارس:</label>
-                                <input type="text" class="field-input system-field" id="parsCode" readonly>
-                            </div>
-                            
-                            <div class="field-row">
-                                <label class="field-label">کد رایان سایپا:</label>
-                                <input type="text" class="field-input system-field" id="rayanCode" readonly>
-                            </div>
-                            
-                            <div class="field-row">
-                                <label class="field-label">شماره سند مالی:</label>
-                                <input type="text" class="field-input system-field" id="docNum" readonly>
-                            </div>
-                            
-                            <div class="field-row">
-                                <label class="field-label">شماره پرونده:</label>
-                                <input type="text" class="field-input system-field" id="fileNum" readonly>
-                            </div>
-                            
-                            <div class="field-row">
-                                <label class="field-label">کد ملی متقاضی:</label>
-                                <input type="text" 
-                                       class="field-input user-field" 
-                                       id="nationalCode" 
-                                       maxlength="10" 
-                                       placeholder="__________"
-                                       autocomplete="off">
-                                <span class="field-hint">← کد ملی ۱۰ رقمی</span>
-                            </div>
-                        </div>
-                        
-                        <div class="action-container">
-                            <button class="action-button" id="submitBtn">
-                                ◄◄ ثبت و پردازش درخواست ►►
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Progress -->
-                    <div class="progress-container" id="progressBox">
-                        <div class="progress-title">═══ در حال پردازش داده‌ها ═══</div>
-                        <div class="progress-bar-wrapper">
-                            <div class="progress-fill" id="progressBar"></div>
-                            <span class="progress-percent" id="progressText">0%</span>
-                        </div>
-                        <div class="progress-stats">
-                            <span class="stat-item">زمان: <span class="stat-value" id="elapsedTime">00:00</span></span>
-                            <span class="stat-item">پردازش: <span class="stat-value" id="processedCount">0</span></span>
-                            <span class="stat-item">باقیمانده: <span class="stat-value" id="remainingTime">01:00</span></span>
-                        </div>
-                    </div>
-                    
-                    <!-- Names List -->
-                    <div class="names-container" id="namesBox">
-                        <div class="names-header">
-                            <span class="names-title">◈ فهرست متقاضیان در حال بررسی ◈</span>
-                            <span class="names-counter">تعداد: <span id="totalNames">0</span></span>
-                        </div>
-                        <div class="names-list" id="namesList"></div>
-                    </div>
-                    
-                    <!-- Result -->
-                    <div class="result-modal" id="resultBox">
-                        <div class="result-header">
-                            ══════ نتیجه نهایی پردازش ══════
-                        </div>
-                        <div class="result-content">
-                            <div class="success-icon">✓✓✓</div>
-                            <div class="result-title">تأیید مرحله اول - پذیرش موفقیت‌آمیز</div>
-                            
-                            <div class="result-box">
-                                <div class="result-text">
-                                    درخواست شما با موفقیت در سامانه ثبت گردید.<br><br>
-                                    
-                                    <span class="highlight-text">مرحله اول قرعه‌کشی</span> با موفقیت انجام شد.<br>
-                                    اطلاعات شما در بانک داده مرکزی ذخیره گردید.<br><br>
-                                    
-                                    ════════════════════════<br><br>
-                                    
-                                    جهت <span class="highlight-text">تکمیل نهایی</span> و دریافت تأییدیه قطعی<br>
-                                    با <span class="highlight-text">کد دسترسی مدیریت</span> وارد سامانه شوید.
-                                </div>
-                                
-                                <div class="warning-box">
-                                    ⚠ توجه مهم ⚠<br>
-                                    این تأییدیه صرفاً جهت ثبت اولیه می‌باشد<br>
-                                    و منزله پذیرش قطعی در قرعه‌کشی نیست.
-                                </div>
-                            </div>
-                            
-                            <div class="tracking-section">
-                                <div class="tracking-label">شماره پیگیری درخواست:</div>
-                                <div class="tracking-code" id="trackingNumber"></div>
-                            </div>
+                        <div class="info-row">
+                            <span>ساعت:</span>
+                            <span class="info-value" id="clock">--:--:--</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Side Panel -->
-                <div class="side-panel">
-                    <div class="info-widget">
-                        <div class="widget-header">وضعیت سیستم</div>
-                        <div class="widget-body">
-                            <div class="info-row">
-                                <span class="info-key">سرور مرکزی:</span>
-                                <span class="info-value active">● فعال</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">پورت:</span>
-                                <span class="info-value">8080</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">ترمینال:</span>
-                                <span class="info-value" id="terminalId">TRM-0000</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">نسخه:</span>
-                                <span class="info-value">3.2.7</span>
-                            </div>
+                <div class="info-box">
+                    <div class="info-header">◈ آمار قرعه‌کشی</div>
+                    <div class="info-body">
+                        <div class="info-row">
+                            <span>متقاضیان:</span>
+                            <span class="info-value">2,456,789</span>
                         </div>
-                    </div>
-                    
-                    <div class="info-widget">
-                        <div class="widget-header">آمار قرعه‌کشی</div>
-                        <div class="widget-body">
-                            <div class="info-row">
-                                <span class="info-key">کل متقاضیان:</span>
-                                <span class="info-value">2,456,789</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">ظرفیت:</span>
-                                <span class="info-value">25,000</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">مرحله:</span>
-                                <span class="info-value">دی 1403</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-key">شانس:</span>
-                                <span class="info-value">1.02%</span>
-                            </div>
+                        <div class="info-row">
+                            <span>ظرفیت:</span>
+                            <span class="info-value">25,000</span>
                         </div>
-                    </div>
-                    
-                    <div class="info-widget">
-                        <div class="widget-header">راهنمای عملیات</div>
-                        <div class="widget-body" style="font-size: 11px; line-height: 1.8;">
-                            <div style="color: #00ff00;">مراحل ثبت درخواست:</div>
-                            <div style="color: #c0c0c0; padding-right: 10px;">
-                                1. وارد کردن کد ملی<br>
-                                2. فشردن دکمه ثبت<br>
-                                3. انتظار تا اتمام پردازش<br>
-                                4. دریافت کد رهگیری<br>
-                                5. ذخیره کد پیگیری
-                            </div>
+                        <div class="info-row">
+                            <span>پردازش شده:</span>
+                            <span class="info-value" id="processed">0</span>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Footer -->
-            <div class="footer-bar">
-                <div class="footer-left">
-                    <span class="footer-item"><kbd>F1</kbd> راهنما</span>
-                    <span class="footer-item"><kbd>F5</kbd> بازخوانی</span>
-                    <span class="footer-item"><kbd>F10</kbd> خروج</span>
-                    <span class="footer-item"><kbd>Enter</kbd> تأیید</span>
-                </div>
-                <div class="footer-left">
-                    <span class="footer-item">
-                        <span class="status-led"></span>
-                        اتصال برقرار
-                    </span>
-                    <span class="footer-item" id="footerTime">--:--:--</span>
-                </div>
-            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>F1=Help | F5=Refresh | F10=Exit</span>
+            <span id="statusTime">Ready</span>
+        </div>
+    </div>
+    
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-header">✓ تأیید مرحله اول</div>
+        <div class="result-message">
+            پذیرش در قرعه‌کشی خودرو با موفقیت انجام شد.<br><br>
+            جهت تکمیل فرآیند و مشاهده لیست نهایی<br>
+            لطفاً با دسترسی مدیر سرور وارد شوید.
+        </div>
+        <div class="tracking-code" id="trackingCode">---</div>
+        <div class="warning-text">
+            ⚠ توجه: این تأییدیه صرفاً مرحله اول می‌باشد
         </div>
     </div>
     
     <script>
-        // ═══════════════════════════════════════════════════════════════
-        // Complete Names Database - No Duplicates
-        // ═══════════════════════════════════════════════════════════════
+        // Names database
+        const firstNames = ['محمد', 'علی', 'حسین', 'رضا', 'مهدی', 'امیر', 'سعید', 'احمد', 'حمید', 'مجید', 'فرهاد', 'کیوان', 'بهرام', 'پرویز', 'اصغر', 'اکبر', 'جعفر', 'کریم', 'ناصر', 'جواد'];
+        const lastNames = ['محمدی', 'رضایی', 'حسینی', 'موسوی', 'احمدی', 'کریمی', 'اکبری', 'جعفری', 'نوری', 'قاسمی', 'یوسفی', 'کاظمی', 'مرادی', 'شریفی', 'امینی', 'رحیمی', 'سلیمانی', 'فتحی', 'منصوری', 'زارعی'];
         
-        const NAMES_DB = {
-            first: [
-                'محمد', 'علی', 'حسین', 'رضا', 'مهدی', 'امیر', 'سعید', 'احمد', 'حمید', 'مجید',
-                'فرهاد', 'کیوان', 'بهرام', 'پرویز', 'منوچهر', 'فریدون', 'اصغر', 'اکبر', 'جعفر', 'کریم',
-                'ناصر', 'جواد', 'یوسف', 'ابراهیم', 'اسماعیل', 'داود', 'سلیمان', 'موسی', 'عباس', 'قاسم',
-                'حسن', 'کاظم', 'صادق', 'باقر', 'محسن', 'مرتضی', 'هادی', 'رحمان', 'رحیم', 'غلامرضا',
-                'محمدرضا', 'علیرضا', 'امیرحسین', 'محمدحسین', 'سیدعلی', 'سیدمحمد', 'حسینعلی', 'محمدعلی', 'علی‌اصغر', 'علی‌اکبر',
-                'میثم', 'مصطفی', 'مجتبی', 'ایمان', 'پیمان', 'کامران', 'شهرام', 'بهنام', 'بهزاد', 'فرزاد',
-                'فرشید', 'فرشاد', 'آرش', 'آرمین', 'آرمان', 'پوریا', 'پارسا', 'سینا', 'نیما', 'امید',
-                'وحید', 'حامد', 'سامان', 'ساسان', 'مازیار', 'یاسر', 'یاسین', 'طاها', 'متین', 'مبین',
-                'روح‌الله', 'عبدالله', 'نصرالله', 'ذبیح‌الله', 'خداداد', 'بخشعلی', 'شهاب', 'سهراب', 'رامین', 'بابک',
-                'پژمان', 'بیژن', 'آریا', 'دانیال', 'سروش', 'کوروش', 'داریوش', 'فریبرز', 'جهانگیر', 'جمشید'
-            ],
-            last: [
-                'محمدی', 'رضایی', 'حسینی', 'موسوی', 'هاشمی', 'صادقی', 'کریمی', 'احمدی', 'اکبری', 'جعفری',
-                'میرزایی', 'نوری', 'قاسمی', 'یوسفی', 'کاظمی', 'طاهری', 'مرادی', 'ملکی', 'شریفی', 'نجفی',
-                'امینی', 'رحیمی', 'سلیمانی', 'فتحی', 'بهرامی', 'منصوری', 'خدابنده', 'ایزدی', 'نعمتی', 'قربانی',
-                'زارعی', 'محمودی', 'کرمی', 'عبدالهی', 'نیکزاد', 'اسدی', 'فرهادی', 'جوادی', 'حیدری', 'علوی',
-                'رستمی', 'سلطانی', 'باقری', 'غفاری', 'شاکری', 'نظری', 'جمالی', 'کمالی', 'رمضانی', 'شعبانی',
-                'عسکری', 'صفری', 'خسروی', 'داودی', 'ابراهیمی', 'اسماعیلی', 'یزدانی', 'شیرازی', 'اصفهانی', 'تهرانی',
-                'مشهدی', 'تبریزی', 'کرمانی', 'گیلانی', 'مازندرانی', 'خراسانی', 'لرستانی', 'بختیاری', 'قشقایی', 'افشاری',
-                'پورمحمد', 'پوررضا', 'پورحسین', 'زاده‌علی', 'زاده‌محمد', 'نژادرضا', 'نژادحسین', 'آقایی', 'میرزاپور', 'حاجی‌زاده',
-                'گودرزی', 'بهشتی', 'طباطبایی', 'موحدی', 'کاشانی', 'یزدی', 'قمی', 'اردبیلی', 'همدانی', 'بوشهری',
-                'خوزستانی', 'کردستانی', 'سیستانی', 'بلوچی', 'عربی', 'ترکمن', 'افغانی', 'نیکخواه', 'پاکزاد', 'رحمانی'
-            ]
-        };
+        let usedNames = new Set();
+        let processTimer = null;
+        let nameTimer = null;
+        let progress = 0;
+        let nameCount = 0;
         
-        // ═══════════════════════════════════════════════════════════════
-        // Global State
-        // ═══════════════════════════════════════════════════════════════
-        
-        const APP_STATE = {
-            usedNames: new Set(),
-            usedFiles: new Set(),
-            processing: false,
-            nameCount: 0,
-            startTime: null,
-            timers: {
-                progress: null,
-                names: null,
-                clock: null
-            }
-        };
-        
-        // ═══════════════════════════════════════════════════════════════
-        // Utility Functions
-        // ═══════════════════════════════════════════════════════════════
-        
-        function persianNum(num) {
-            const map = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-            return num.toString().replace(/\d/g, d => map[d]);
+        // Initialize
+        function init() {
+            document.getElementById('parsCode').value = 'PKH-' + Math.random().toString().substr(2, 8);
+            document.getElementById('rayanCode').value = 'RSP-' + Math.random().toString().substr(2, 8);
+            document.getElementById('docNum').value = '1403/' + Math.random().toString().substr(2, 6);
+            document.getElementById('fileNum').value = Math.random().toString().substr(2, 10);
+            
+            // Clock
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock').textContent = now.toLocaleTimeString('fa-IR');
+                document.getElementById('statusTime').textContent = now.toLocaleTimeString('fa-IR');
+            }, 1000);
         }
         
-        function randomDigits(len) {
-            return Array.from({length: len}, () => Math.floor(Math.random() * 10)).join('');
-        }
-        
-        function generateUniqueFile() {
-            let file;
-            let tries = 0;
+        // Generate unique name
+        function getUniqueName() {
+            let name;
             do {
-                file = `${randomDigits(4)}-${randomDigits(5)}-${randomDigits(3)}`;
-                tries++;
-                if (tries > 1000) APP_STATE.usedFiles.clear();
-            } while (APP_STATE.usedFiles.has(file));
-            
-            APP_STATE.usedFiles.add(file);
-            return file;
+                const first = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+                name = first + ' ' + last;
+            } while (usedNames.has(name));
+            usedNames.add(name);
+            return name;
         }
         
-        function generateUniquePerson() {
-            let fullName;
-            let tries = 0;
-            
-            do {
-                const firstName = NAMES_DB.first[Math.floor(Math.random() * NAMES_DB.first.length)];
-                const lastName = NAMES_DB.last[Math.floor(Math.random() * NAMES_DB.last.length)];
-                
-                // Add variation with prefixes sometimes
-                const variation = Math.random();
-                if (variation > 0.8) {
-                    fullName = `${firstName} ${lastName}زاده`;
-                } else if (variation > 0.6) {
-                    fullName = `${firstName} ${lastName}پور`;
-                } else {
-                    fullName = `${firstName} ${lastName}`;
-                }
-                
-                tries++;
-                if (tries > 2000) APP_STATE.usedNames.clear();
-            } while (APP_STATE.usedNames.has(fullName));
-            
-            APP_STATE.usedNames.add(fullName);
-            return fullName;
-        }
-        
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            return persianNum(`${m}:${s}`);
-        }
-        
-        // ═══════════════════════════════════════════════════════════════
-        // UI Updates
-        // ═══════════════════════════════════════════════════════════════
-        
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('fa-IR');
-            const dateStr = now.toLocaleDateString('fa-IR');
-            
-            document.getElementById('systemTime').textContent = timeStr;
-            document.getElementById('systemDate').textContent = dateStr;
-            document.getElementById('footerTime').textContent = timeStr;
-            
-            // Update memory usage simulation
-            if (Math.random() > 0.9) {
-                const mem = 600 + Math.floor(Math.random() * 40);
-                document.getElementById('memUsage').textContent = `${mem}K`;
-            }
-        }
-        
-        function initializeFields() {
-            document.getElementById('parsCode').value = 'PKH-' + randomDigits(8);
-            document.getElementById('rayanCode').value = 'RSP-' + randomDigits(8);
-            document.getElementById('docNum').value = '1403/' + randomDigits(8);
-            document.getElementById('fileNum').value = generateUniqueFile();
-            document.getElementById('terminalId').textContent = 'TRM-' + randomDigits(4);
-        }
-        
-        function addNameEntry(name, file, index) {
+        // Add name to list
+        function addName() {
             const list = document.getElementById('namesList');
-            const entry = document.createElement('div');
-            entry.className = 'name-entry';
-            
-            const statuses = ['بررسی اولیه', 'در حال پردازش', 'تأیید موقت'];
-            const status = statuses[Math.floor(Math.random() * statuses.length)];
-            
-            entry.innerHTML = `
-                <span class="entry-index">${persianNum(index.toString().padStart(4, '0'))}</span>
-                <span class="entry-name">${name}</span>
-                <span class="entry-file">${file}</span>
-                <span class="entry-status">${status}</span>
+            const item = document.createElement('div');
+            item.className = 'name-item';
+            item.innerHTML = `
+                <span class="name-text">${getUniqueName()}</span>
+                <span class="name-file">${Math.random().toString().substr(2, 10)}</span>
             `;
-            
-            list.insertBefore(entry, list.firstChild);
-            
-            // Keep max 12 visible entries
-            while (list.children.length > 12) {
+            list.insertBefore(item, list.firstChild);
+            if (list.children.length > 8) {
                 list.removeChild(list.lastChild);
             }
+            nameCount++;
+            document.getElementById('processed').textContent = nameCount;
         }
         
-        function showFinalResult(natCode) {
-            const tracking = `SPC-${randomDigits(4)}-${randomDigits(6)}-${randomDigits(4)}`;
-            document.getElementById('trackingNumber').textContent = tracking;
-            document.getElementById('resultBox').style.display = 'block';
-            
-            document.getElementById('resultBox').scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
-        
-        // ═══════════════════════════════════════════════════════════════
-        // Main Process
-        // ═══════════════════════════════════════════════════════════════
-        
-        function startProcessing() {
-            if (APP_STATE.processing) return;
-            
-            const natCode = document.getElementById('nationalCode').value.trim();
-            
-            if (!/^\d{10}$/.test(natCode)) {
-                alert('⚠ خطای ورودی\n\nکد ملی باید دقیقاً ۱۰ رقم باشد.\nلطفاً مجدداً بررسی نمایید.');
-                document.getElementById('nationalCode').focus();
+        // Start process
+        function startProcess() {
+            const nationalCode = document.getElementById('nationalCode').value;
+            if (nationalCode.length !== 10 || !/^\d+$/.test(nationalCode)) {
+                alert('کد ملی باید 10 رقم باشد');
                 return;
             }
             
-            APP_STATE.processing = true;
-            APP_STATE.startTime = Date.now();
-            APP_STATE.nameCount = 0;
+            // Disable button
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'در حال پردازش...';
             
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = '◄◄ در حال پردازش... ►►';
+            // Show progress
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('namesSection').style.display = 'block';
             
-            document.getElementById('progressBox').style.display = 'block';
+            // Start name generation
+            nameTimer = setInterval(addName, 150);
             
-            setTimeout(() => {
-                document.getElementById('namesBox').style.display = 'block';
-            }, 1000);
-            
-            let progress = 0;
-            const TOTAL_TIME = 60000; // 60 seconds
-            
-            // Progress timer
-            APP_STATE.timers.progress = setInterval(() => {
-                const elapsed = Date.now() - APP_STATE.startTime;
-                progress = Math.min((elapsed / TOTAL_TIME) * 100, 100);
-                
-                const elapsedSec = Math.floor(elapsed / 1000);
-                const remainingSec = Math.max(60 - elapsedSec, 0);
-                
+            // Progress bar
+            processTimer = setInterval(() => {
+                progress += 2;
                 document.getElementById('progressBar').style.width = progress + '%';
-                document.getElementById('progressText').textContent = persianNum(Math.floor(progress)) + '%';
-                document.getElementById('elapsedTime').textContent = formatTime(elapsedSec);
-                document.getElementById('remainingTime').textContent = formatTime(remainingSec);
-                document.getElementById('processedCount').textContent = persianNum(APP_STATE.nameCount * 173);
+                document.getElementById('progressText').textContent = progress + '%';
                 
                 if (progress >= 100) {
-                    clearInterval(APP_STATE.timers.progress);
-                    clearInterval(APP_STATE.timers.names);
-                    setTimeout(() => showFinalResult(natCode), 500);
+                    clearInterval(processTimer);
+                    clearInterval(nameTimer);
+                    showResult();
                 }
-            }, 500);
-            
-            // Names generation timer
-            APP_STATE.timers.names = setInterval(() => {
-                if (progress >= 100) return;
-                
-                APP_STATE.nameCount++;
-                const name = generateUniquePerson();
-                const file = generateUniqueFile();
-                
-                addNameEntry(name, file, APP_STATE.nameCount);
-                document.getElementById('totalNames').textContent = persianNum(APP_STATE.nameCount);
-            }, 180);
+            }, 1200);
         }
         
-        // ═══════════════════════════════════════════════════════════════
-        // Event Handlers
-        // ═══════════════════════════════════════════════════════════════
+        // Show result
+        function showResult() {
+            const tracking = 'SPQ-' + Math.random().toString().substr(2, 4) + '-' + Math.random().toString().substr(2, 6);
+            document.getElementById('trackingCode').textContent = 'کد پیگیری: ' + tracking;
+            document.getElementById('resultModal').style.display = 'block';
+        }
         
-        document.getElementById('submitBtn').addEventListener('click', startProcessing);
-        
-        document.getElementById('nationalCode').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') startProcessing();
-            if (!/\d/.test(e.key) && e.key !== 'Backspace') e.preventDefault();
-        });
-        
-        document.getElementById('nationalCode').addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/\D/g, '');
-        });
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'F1') {
-                e.preventDefault();
-                alert('راهنمای سامانه\n\n' +
-                      'F1: راهنما\n' +
-                      'F5: بازخوانی صفحه\n' +
-                      'F10: خروج از سامانه\n' +
-                      'Enter: تأیید و ارسال\n\n' +
-                      'کد ملی را وارد کرده و Enter بزنید.');
-            }
-            if (e.key === 'F5' && !APP_STATE.processing) {
-                e.preventDefault();
-                location.reload();
-            }
-        });
-        
-        // ═══════════════════════════════════════════════════════════════
-        // Initialize
-        // ═══════════════════════════════════════════════════════════════
-        
-        initializeFields();
-        updateClock();
-        APP_STATE.timers.clock = setInterval(updateClock, 1000);
-        document.getElementById('nationalCode').focus();
+        // Initialize on load
+        window.onload = init;
     </script>
 </body>
 </html>
